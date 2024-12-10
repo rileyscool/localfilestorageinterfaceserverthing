@@ -1,27 +1,43 @@
 const express = require("express")
 const app = express()
 
+app.set("view engine", "ejs")
+
 const fs = require('fs')
 const config = require("./config.json")
 
+if(!fs.existsSync('./users/')) {
+    fs.mkdirSync('./users/')
+}
 
 app.get("/", (req, res) =>{
-
+res.render('index')
 })
 
 res.get("/login", (req, res) =>{
-
+    res.render('login')
 })
 
 res.get("/register", (req, res) =>{
-
+    res.render('register')
 })
 
 res.get("/dashboard", (req, res) =>{
-
+    res.render('dashboard')
 })
 
 
+app.post("/accountFiles", (req, res) =>{ // this makes more sense to be a get but too bad
+    desiredAccount = req.cookie.get("username") || null
+    if(!desiredAccount){
+        // you have no account but you are sending a request? interesting.
+        return res.status(500).send("fuck off")
+    }
+    userFiles = fs.readdirSync(`./users/${desiredAccount}`, { withFileTypes: true, recursive: true }) // idk if this includes folders or not so, we will see.
+
+    res.send({files: userFiles}) // seems wrong, we will see later
+
+})
 
 app.post('/account', (req, res) =>{
     // dont judge me because i cant be bothered adding like encryption or some shit for this because its local
@@ -39,7 +55,7 @@ app.post('/account', (req, res) =>{
             dataToWrite[username] = {pass: password}
             fs.writeFileSync("./users/users.json", JSON.stringify(dataToWrite))
             res.redirect(`/login`) // make them login again because i can
-            fs.mkdirSync(`./users/${username}`) // make a folder for the users files
+            return fs.mkdirSync(`./users/${username}`) // make a folder for the users files
         }
         let allData = JSON.parse(fs.readFileSync("./users/users.json")) // ew ikr
         if(allData[username]){
