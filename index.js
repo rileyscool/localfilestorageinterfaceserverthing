@@ -50,13 +50,10 @@ app.post('/account', (req, res) =>{
         // also im gonna be stupid and store userdata in a json file 💀💀
         if(!fs.existsSync("./users/users.json")){
             // wow the first user to sign up!! we should give them an award
-            // dont need to check if somebody is already using that username anymore
             let dataToWrite = {}
-            dataToWrite[username] = {pass: password}
             fs.writeFileSync("./users/users.json", JSON.stringify(dataToWrite))
-            res.redirect(`/login`) // make them login again because i can
-            return fs.mkdirSync(`./users/${username}`) // make a folder for the users files
         }
+
         let allData = JSON.parse(fs.readFileSync("./users/users.json")) // ew ikr
         if(allData[username]){
             res.status(418).send({"Error": "Username is taken"}) // im a teapot heehe
