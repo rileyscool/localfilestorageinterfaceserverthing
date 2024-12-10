@@ -1,0 +1,25 @@
+<html>
+<head>
+    <script>
+        function login(){
+            const req = new XMLHttpRequest();
+            req.open('POST', '/account')
+            req.setRequestHeader('Content-Type', 'application/json');
+            req.send(JSON.stringify({stuff: {action: "login", username: document.getElementById('username').value, password: document.getElementById('password').value}})).then(res =>{
+                if(res.status == 200){
+                    document.location.href = "/dashboard"
+                }else{
+                    alert(res.message)
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+    <input type="text" name="username" id="username" placeholder="Username"><br>
+    <input type="password" name="password"  id="password" placeholder="Password"><br>
+    <button onclick="login()">Login</button>
+    </br>
+    </br>
+</body>
+</html>
