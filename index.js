@@ -1,6 +1,8 @@
 const express = require("express")
+const cookieParser = require('cookie-parser');
 const app = express()
 
+app.use(cookieParser()); // oh my god i should have just read the docs instead of this shit
 app.set("view engine", "ejs")
 
 const fs = require('fs')
@@ -14,21 +16,24 @@ app.get("/", (req, res) =>{
 res.render('index')
 })
 
-res.get("/login", (req, res) =>{
+
+// why were these all res instead of app 💀
+app.get("/login", (req, res) =>{
     res.render('login')
 })
 
-res.get("/register", (req, res) =>{
+app.get("/register", (req, res) =>{
     res.render('register')
 })
 
-res.get("/dashboard", (req, res) =>{
+app.get("/dashboard", (req, res) =>{
     res.render('dashboard')
 })
 
 
 app.post("/accountFiles", (req, res) =>{ // this makes more sense to be a get but too bad
-    desiredAccount = req.cookie.get("username") || null
+    desiredAccount = req.cookies.username || null
+
     if(!desiredAccount){
         // you have no account but you are sending a request? interesting.
         return res.status(500).send("fuck off")
