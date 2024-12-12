@@ -1,25 +1,94 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <script>
-        function login(){
-            const req = new XMLHttpRequest();
-            req.open('POST', '/account')
-            req.setRequestHeader('Content-Type', 'application/json');
-            req.send(JSON.stringify({stuff: {action: "login", username: document.getElementById('username').value, password: document.getElementById('password').value}})).then(res =>{
-                if(res.status == 200){
-                    document.location.href = "/dashboard"
-                }else{
-                    alert(res.message)
-                }
-            })
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
-    </script>
+
+        h1 {
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .form-container button {
+            width: 100%;
+            padding: 10px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .form-container button:hover {
+            background: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <input type="text" name="username" id="username" placeholder="Username"><br>
-    <input type="password" name="password"  id="password" placeholder="Password"><br>
+<h1>Login</h1>
+<div class="form-container">
+    <input type="text" name="username" id="username" placeholder="Username">
+    <input type="password" name="password" id="password" placeholder="Password">
     <button onclick="login()">Login</button>
-    </br>
-    </br>
+</div>
+
+<script>
+    function login() {
+        const req = new XMLHttpRequest();
+        req.open('POST', '/account');
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify({
+            stuff: {
+                action: "login",
+                username: document.getElementById('username').value,
+                password: document.getElementById('password').value
+            }
+        }));
+        req.onload = function () {
+            if (req.status == 200) {
+                window.location = '/dashboard';
+            } else {
+                alert(req.responseText);
+            }
+        };
+    }
+</script>
 </body>
 </html>
