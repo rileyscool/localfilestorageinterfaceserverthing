@@ -1,48 +1,122 @@
-<script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Files</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
 
+        h1 {
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        ul#files {
+            list-style: none;
+            padding: 0;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        ul#files li {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        ul#files li:last-child {
+            border-bottom: none;
+        }
+
+        ul#files li a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+            flex-grow: 1;
+            text-align: left;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        ul#files li a:hover {
+            text-decoration: underline;
+        }
+
+        ul#files li:hover {
+            background: #f9f9f9;
+        }
+
+        ul#files li a.full-name {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: unset;
+        }
+
+        ul#files li:hover a {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: unset;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <h1>Files</h1> <button>Upload</button>
+
+    <ul id="files">
+
+    </ul>
+</div>
+
+<script>
     function getCookie(name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(";").shift();
         return null;
     }
-    // i hate cookies, i hate html, i hate browsers ugh.
-
 
     async function refreshFiles() {
         const req = new XMLHttpRequest();
         req.open('POST', "accountFiles", true);
         const response = await new Promise((resolve, reject) => {
             req.onload = () => {
-               resolve(req.response);
+                resolve(req.response);
             };
             req.send();
         });
 
-
-
-        data = JSON.parse(response);
+        const data = JSON.parse(response);
         console.log(data);
         data.files.forEach(file => {
-            console.log(file.name)
-            element = document.createElement("li");
-            linkthing = document.createElement("a");
+            console.log(file.name);
+            const element = document.createElement("li");
+            const linkthing = document.createElement("a");
             linkthing.innerHTML = file.name;
             linkthing.setAttribute("href", `/files/${getCookie("username")}/${file.name}`);
+            linkthing.classList.add("full-name");
             element.appendChild(linkthing);
-            // element.parent = element.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement;
-            // what is this ai doing
-             document.getElementById("files").appendChild(element);
-        })
-
+            document.getElementById("files").appendChild(element);
+        });
     }
 
+    refreshFiles();
 </script>
-
-<div>
-    <h1>Files</h1>
-
-    <ul id="files">
-
-    </ul>
-</div>
+</body>
+</html>

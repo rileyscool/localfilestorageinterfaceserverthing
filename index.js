@@ -37,7 +37,7 @@ app.get("/files/*", (req, res) =>{
     filename = baseUrl.split("/")[3]
     fileLocation = __dirname + `/users/${user}/${filename}`
     if(fs.existsSync(fileLocation)){
-        res.sendFile(fileLocation)
+        res.download(fileLocation)
     }else{
         res.status(404).send("No such file g")
     }
@@ -46,7 +46,7 @@ app.get("/files/*", (req, res) =>{
 
 app.post("/accountFiles", (req, res) =>{ // this makes more sense to be a get but too bad
     desiredAccount = req.cookies.username || null
-
+    console.log(desiredAccount)
     if(!desiredAccount){
         // you have no account but you are sending a request? interesting.
         return res.status(500).send("fuck off")
@@ -93,18 +93,23 @@ app.post('/account', (req, res) =>{
         if(allData[username]){
             // res.status(418).send({"Error": "Username is taken"})
             // ^^ ai suggestion 💀 stupid shit
-            if(allData[username] === password){
-                res.cookie("username", allData[username]) // cbf doing auth so this is good enough authentication for me hahaha
-                res.status(200)
-            }{
-                res.status(418).send({"Error": "Username or password is incorrect"}) // its the username
+            if(allData[username].pass.toString() === password.toString()){
+                console.log("wow its right!")
+                res.cookie("username", username) // cbf doing auth so this is good enough authentication for me hahaha
+                res.status(200).send(200)
+            }else{
+                console.log(allData[username].pass.toString() === password.toString())
+                res.status(418).send({"Error": "Username or password is incorrect"}) // its the password
+                console.log("wrong apss")
+                console.log(password, allData[username].pass)
             }
         }else{
             res.status(418).send({"Error": "Username or password is incorrect"}) // its the username
+            console.log("wrong user")
         }
 
     }
 })
 
 app.listen(config.port || 1234)
-console.log(`Page open at https://localhost:${config.port || 1234}/`)
+console.log(`Page open at http://localhost:${config.port || 1234}/`)
