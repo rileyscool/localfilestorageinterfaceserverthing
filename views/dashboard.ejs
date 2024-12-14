@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://kit.fontawesome.com/65752bd016.js" crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Files</title>
@@ -61,6 +62,30 @@
         ul#files li:hover {
             background: #f9f9f9;
         }
+        ul#files li {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        ul#files li a.full-name {
+            flex-grow: 1;
+            text-align: left;
+        }
+
+        ul#files li button.delete-button {
+            background: none;
+            border: none;
+            color: #007BFF;
+            cursor: pointer;
+        }
+
+        ul#files li button.delete-button:hover {
+            color: #FF0000;  // Change color on hover
+        }
+
 
         ul#files li a.full-name {
             white-space: normal;
@@ -77,11 +102,10 @@
 </head>
 <body>
 <div>
-    <h1>Files</h1> <button>Upload</button>
-
-    <ul id="files">
-
-    </ul>
+    <h1>Files</h1>
+    <input type="file" id="fileInput" multiple />
+    <button onclick="upload()">Upload</button>
+    <ul id="files"></ul>
 </div>
 
 <script>
@@ -92,7 +116,15 @@
         return null;
     }
 
+    window.onload = function () {
+        if(getCookie('username') == null){
+            document.location.href = "/login"
+        }
+    }
+
     async function refreshFiles() {
+        var element = document.getElementById("files");
+        element.innerHTML = "";
         const req = new XMLHttpRequest();
         req.open('POST', "accountFiles", true);
         const response = await new Promise((resolve, reject) => {
@@ -107,13 +139,60 @@
         data.files.forEach(file => {
             console.log(file.name);
             const element = document.createElement("li");
+
             const linkthing = document.createElement("a");
             linkthing.innerHTML = file.name;
             linkthing.setAttribute("href", `/files/${getCookie("username")}/${file.name}`);
             linkthing.classList.add("full-name");
+
+            const deleteb = document.createElement("button"); // Change to button element
+            deleteb.innerHTML = `<i class="fa-solid fa-trash"></i>`;
+            deleteb.setAttribute("onclick", `deleteFile("${file.name}")`);  // Assumed function name `deleteFile`
+            deleteb.classList.add("delete-button");  // Add a class for styling
+
             element.appendChild(linkthing);
+            element.appendChild(deleteb);
+
             document.getElementById("files").appendChild(element);
         });
+
+    }
+
+    function upload(){
+        const fileInput = document.getElementById("fileInput");
+        const files = fileInput.files;
+        if (files.length > 0) {
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload', true);
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    console.log('Files uploaded successfully!');
+                    refreshFiles(); // Refresh the file list after upload
+                } else {
+                    console.log('File upload failed:', xhr.statusText);
+                }
+            };
+            xhr.send(formData);
+        }
+    }
+
+    function deleteFile(filename) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('DELETE', `/delete?filename=${filename}`, true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                console.log('File deleted successfully!');
+                refreshFiles();
+            } else {
+                console.log('File deletion failed:', xhr.statusText);
+            }
+        };
+        xhr.send();
     }
 
     refreshFiles();
